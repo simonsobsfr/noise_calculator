@@ -154,8 +154,14 @@ def Simons_Observatory_V3_SA_noise(sensitivity_mode,
         N_ell_P_225 *= np.exp( ell*(ell+1)* SA_beams[4]**2. )
         N_ell_P_280 *= np.exp( ell*(ell+1)* SA_beams[5]**2. )
 
-    ## make an array of noise curves for P
-    N_ell_P_SA = np.array([N_ell_P_27,N_ell_P_39,N_ell_P_93,N_ell_P_145,N_ell_P_225,N_ell_P_280])
+
+    freq_list = [27, 39, 93, 145, 225, 280]
+    N_ell_P_SA = np.array([N_ell_P_27, N_ell_P_39, N_ell_P_93, N_ell_P_145, N_ell_P_225, N_ell_P_280])
+
+    N_ell_P_dict = {}
+
+    for i, freq in enumerate(freq_list):
+        N_ell_P_dict[freq] = N_ell_P_SA[i]
 
     ####################################################################
-    return(ell, N_ell_P_SA, Map_white_noise_levels)
+    return(ell, N_ell_P_dict, Map_white_noise_levels)

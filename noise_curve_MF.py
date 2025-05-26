@@ -45,31 +45,37 @@ obs_eff = 0.2
 
 freq_list = [27, 39, 93, 145, 225, 280]
 
-ell, N_ell_P_SA, Map_white_noise_levels = so_noise.Simons_Observatory_V3_SA_noise(sensitivity_mode,
-                                                                                  one_over_f_mode,
-                                                                                  f_sky,
-                                                                                  ell_min,
-                                                                                  ell_max,
-                                                                                  delta_ell,
-                                                                                  n_years,
-                                                                                  NTubes_LF,
-                                                                                  NTubes_MF,
-                                                                                  NTubes_UHF,
-                                                                                  obs_eff = obs_eff)
+ell, N_ell_P_dict, Map_white_noise_levels = so_noise.Simons_Observatory_V3_SA_noise(sensitivity_mode,
+                                                                                    one_over_f_mode,
+                                                                                    f_sky,
+                                                                                    ell_min,
+                                                                                    ell_max,
+                                                                                    delta_ell,
+                                                                                    n_years,
+                                                                                    NTubes_LF,
+                                                                                    NTubes_MF,
+                                                                                    NTubes_UHF,
+                                                                                    obs_eff = obs_eff)
+
+
+N_ell_all = 1/ (1/N_ell_P_dict[93] +  1/N_ell_P_dict[145])
 
 fac = ell * (ell + 1) / ( 2* np.pi)
 
 plt.loglog()
 plt.xlim(0, ell_max)
-plt.plot(l, ps["EE"])
-plt.plot(l, ps["BB"])
+plt.plot(l, ps["EE"], color="black")
+plt.plot(l, ps["BB"], color="black")
+plt.plot(ell, N_ell_all * fac, label=f"noise combined")
+
 for i, freq in enumerate(freq_list):
     print(freq, Map_white_noise_levels[i])
     
     if freq in [93, 145]:
-        plt.plot(ell, N_ell_P_SA[i] * fac, label=f"{freq} GHz")
+        plt.plot(ell, N_ell_P_dict[freq] * fac, label=f"noise {freq} GHz")
 plt.legend()
 plt.savefig("noise.png")
 plt.clf()
 plt.close()
 
+np.savetxt("noise_power.dat", np.transpose([ell, N_ell_all, N_ell_P_dict[93], N_ell_P_dict[145]]))
