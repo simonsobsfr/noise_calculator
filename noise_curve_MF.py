@@ -31,7 +31,16 @@ def read_ps(file_name, spectra=None):
 spectra = ['TT', 'TE', 'TB', 'ET', 'BT', 'EE', 'EB', 'BE', 'BB']
 l, ps = read_ps("cmb.dat", spectra=spectra)
 
-sensitivity_mode = 1
+
+sensitivity_mode = "baseline"
+#sensitivity_mode = "goal"
+
+if sensitivity_mode == "baseline":
+    s_mode = 1
+if sensitivity_mode == "goal":
+    s_mode = 2
+
+
 one_over_f_mode = 1
 f_sky = 0.4
 ell_min = 2
@@ -42,10 +51,13 @@ NTubes_LF = 0
 NTubes_MF = 1
 NTubes_UHF = 0
 obs_eff = 0.2
+apply_kludge_correction = False
+apply_beam_correction = True
+
 
 freq_list = [27, 39, 93, 145, 225, 280]
 
-ell, N_ell_P_dict, Map_white_noise_levels = so_noise.Simons_Observatory_V3_SA_noise(sensitivity_mode,
+ell, N_ell_P_dict, Map_white_noise_levels = so_noise.Simons_Observatory_V3_SA_noise(s_mode,
                                                                                     one_over_f_mode,
                                                                                     f_sky,
                                                                                     ell_min,
@@ -55,7 +67,9 @@ ell, N_ell_P_dict, Map_white_noise_levels = so_noise.Simons_Observatory_V3_SA_no
                                                                                     NTubes_LF,
                                                                                     NTubes_MF,
                                                                                     NTubes_UHF,
-                                                                                    obs_eff = obs_eff)
+                                                                                    obs_eff = obs_eff,
+                                                                                    apply_kludge_correction=apply_kludge_correction,
+                                                                                    apply_beam_correction=apply_beam_correction)
 
 
 N_ell_all = 1/ (1/N_ell_P_dict[93] +  1/N_ell_P_dict[145])
@@ -78,4 +92,4 @@ plt.savefig("noise.png")
 plt.clf()
 plt.close()
 
-np.savetxt("noise_power.dat", np.transpose([ell, N_ell_all, N_ell_P_dict[93], N_ell_P_dict[145]]))
+np.savetxt(f"noise_power_{sensitivity_mode}.dat", np.transpose([ell, N_ell_all, N_ell_P_dict[93], N_ell_P_dict[145]]))
